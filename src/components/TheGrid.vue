@@ -1,90 +1,204 @@
 <script setup>
-import WelcomeItem from './WelcomeItem.vue'
-import DocumentationIcon from './icons/IconDocumentation.vue'
-import ToolingIcon from './icons/IconTooling.vue'
-import EcosystemIcon from './icons/IconEcosystem.vue'
-import CommunityIcon from './icons/IconCommunity.vue'
-import SupportIcon from './icons/IconSupport.vue'
+import { ref, onMounted, onBeforeUnmount, reactive } from 'vue';
+
+const initRows = () => {
+  return Array(5)
+    .fill(null)
+    .map(() =>
+      Array(5)
+        .fill(null)
+        .map(() => ({
+          letter: '',
+          evaluation: '',
+        })),
+    );
+};
+
+const rows = reactive(initRows());
+let currentRowIndex = ref(0);
+let turn = ref(0);
+let mysteryWord = reactive([]);
+let frequencies = reactive({});
+
+async function fetchWordDataMuse() {
+  try {
+    const response = await fetch(`https://api.datamuse.com/words?sp=?????`);
+    const words = await response.json();
+    const word = words[Math.floor(Math.random() * 100)].word;
+    console.log('word in fetch', word);
+    mysteryWord = word.split("");
+    console.log('mw in fetch', mysteryWord);
+  } catch (error) {
+    console.error('Error fetching wordle data', error);
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('keydown', handleKeyPress);
+  fetchWordDataMuse();
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('keydown', handleKeyPress);
+})
+
+const handleKeyPress = (e) => {
+  if (e.metaKey || e.ctrlKey) {
+    return; // Allow the default behavior for shortcuts like Cmd+R or Ctrl+R
+  }
+
+  if (/^[a-z]$/i.test(e.key) && currentRowIndex.value < 5 && turn.value < 5) {
+    e.preventDefault();
+    addLetterToTile(e.key);
+    currentRowIndex.value++;
+  }
+
+  if (e.key === 'Backspace' && currentRowIndex.value > 0) {
+    currentRowIndex.value = currentRowIndex.value - 1
+    removeLetterFromTile();
+  }
+
+  if (e.key === 'Enter' && currentRowIndex.value === 5) {
+    setFrequencies();
+
+    currentRowIndex.value = 0;
+    evaluateGuess();
+    turn.value++;
+  }
+}
+
+function addLetterToTile(key) {
+  rows[turn.value][currentRowIndex.value].letter = key;
+}
+
+function removeLetterFromTile() {
+  rows[turn.value][currentRowIndex.value].letter = '';
+}
+
+// this will help to mark a tile yellow if the same letter is correct at a higher index of a word
+// and will lead to more expected behaviour as opposed to out of te box functions like filter and includes
+function setFrequencies() {
+  frequencies = {};
+  mysteryWord.forEach((letter) => {
+    if (frequencies[letter]) {
+      frequencies[letter] += 1;
+    } else {
+      frequencies[letter] = 1;
+    }
+  });
+}
+
+function markCorrectLetters() {
+  rows[turn.value].map((tile, index) => {
+    if (tile.letter === mysteryWord[index]) {
+      tile.evaluation = 'correct';
+      if (frequencies[tile.letter] > 0) {
+        frequencies[tile.letter]--;
+      }
+    }
+  });
+}
+
+function markPresentLetters() {
+  rows[turn.value].map((tile) => {
+    if (
+      mysteryWord.includes(tile.letter) &&
+      tile.evaluation !== 'correct' &&
+      frequencies[tile.letter] > 0
+    ) {
+      tile.evaluation = 'present';
+      frequencies[tile.letter]--;
+    }
+  });
+}
+
+function evaluateGuess() {
+  setFrequencies();
+  markCorrectLetters();
+  markPresentLetters();
+}
+
 </script>
 
 <template>
-  <WelcomeItem>
-    <template #icon>
-      <DocumentationIcon />
-    </template>
-    <template #heading>Documentation</template>
-
-    Vue’s
-    <a href="https://vuejs.org/" target="_blank" rel="noopener">official documentation</a>
-    provides you with all information you need to get started.
-  </WelcomeItem>
-
-  <WelcomeItem>
-    <template #icon>
-      <ToolingIcon />
-    </template>
-    <template #heading>Tooling</template>
-
-    This project is served and bundled with
-    <a href="https://vite.dev/guide/features.html" target="_blank" rel="noopener">Vite</a>. The
-    recommended IDE setup is
-    <a href="https://code.visualstudio.com/" target="_blank" rel="noopener">VSCode</a>
-    +
-    <a href="https://github.com/johnsoncodehk/volar" target="_blank" rel="noopener">Volar</a>. If
-    you need to test your components and web pages, check out
-    <a href="https://www.cypress.io/" target="_blank" rel="noopener">Cypress</a>
-    and
-    <a href="https://on.cypress.io/component" target="_blank" rel="noopener"
-      >Cypress Component Testing</a
-    >.
-
-    <br />
-
-    More instructions are available in <code>README.md</code>.
-  </WelcomeItem>
-
-  <WelcomeItem>
-    <template #icon>
-      <EcosystemIcon />
-    </template>
-    <template #heading>Ecosystem</template>
-
-    Get official tools and libraries for your project:
-    <a href="https://pinia.vuejs.org/" target="_blank" rel="noopener">Pinia</a>,
-    <a href="https://router.vuejs.org/" target="_blank" rel="noopener">Vue Router</a>,
-    <a href="https://test-utils.vuejs.org/" target="_blank" rel="noopener">Vue Test Utils</a>, and
-    <a href="https://github.com/vuejs/devtools" target="_blank" rel="noopener">Vue Dev Tools</a>. If
-    you need more resources, we suggest paying
-    <a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">Awesome Vue</a>
-    a visit.
-  </WelcomeItem>
-
-  <WelcomeItem>
-    <template #icon>
-      <CommunityIcon />
-    </template>
-    <template #heading>Community</template>
-
-    Got stuck? Ask your question on
-    <a href="https://chat.vuejs.org" target="_blank" rel="noopener">Vue Land</a>, our official
-    Discord server, or
-    <a href="https://stackoverflow.com/questions/tagged/vue.js" target="_blank" rel="noopener"
-      >StackOverflow</a
-    >. You should also subscribe to
-    <a href="https://news.vuejs.org" target="_blank" rel="noopener">our mailing list</a>
-    and follow the official
-    <a href="https://twitter.com/vuejs" target="_blank" rel="noopener">@vuejs</a>
-    twitter account for latest news in the Vue world.
-  </WelcomeItem>
-
-  <WelcomeItem>
-    <template #icon>
-      <SupportIcon />
-    </template>
-    <template #heading>Support Vue</template>
-
-    As an independent project, Vue relies on community backing for its sustainability. You can help
-    us by
-    <a href="https://vuejs.org/sponsor/" target="_blank" rel="noopener">becoming a sponsor</a>.
-  </WelcomeItem>
+  <div class="grid">
+    <div class="grid__row" v-for="row in rows" :key="row">
+      <div
+        class="grid__item"
+        v-for="item in row"
+        :key="item"
+        :class="{
+          'grid__item--filled': item.letter !== '',
+          'letter-present': item.evaluation === 'present',
+          'letter-correct': item.evaluation === 'correct',
+        }"
+      >
+        {{ item.letter }}
+      </div>
+    </div>
+  </div>
+  <p> the word is {{ mysteryWord }}</p>
 </template>
+
+<style scoped>
+button {
+  font-weight: bold;
+}
+
+.grid {
+  display: flex;
+  flex-direction: column;
+  min-width: 25rem;
+  max-width: 30rem;
+  min-height: 25rem;
+  max-height: 30rem;
+  align-self: center;
+  margin-top: 1.2rem;
+}
+
+.grid__row {
+  display: flex;
+  justify-content: center;
+  min-width: 25rem;
+  max-width: 30rem;
+}
+
+.grid__item {
+  border: 2px solid #3b3b3c;
+  border-radius: 0.4rem;
+  color: white;
+  padding: 1px;
+  width: 5rem;
+  height: 5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.6rem;
+  text-transform: uppercase;
+  font-weight: bold;
+  margin: 0.3rem;
+}
+
+.grid__item--filled {
+  background-color: #333335;
+  animation: fadeInAnimation 0.2s;
+}
+
+.letter-correct {
+  background-color: #498245;
+}
+
+.letter-present {
+  background-color: #b59535;
+}
+
+/* Add the keyframes for the fadeInAnimation if needed */
+@keyframes fadeInAnimation {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+</style>

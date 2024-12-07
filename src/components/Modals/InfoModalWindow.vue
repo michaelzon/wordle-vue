@@ -1,36 +1,111 @@
 <template>
-  <div class="inner">
-    <h2>This is a modal window!</h2>
-    <p>You have done such great work! Congratulations on reaching this step!</p>
+  <div class="modal">
+    <div class="modal__emoji">{{ emoji }}</div>
+    <div class="modal__header">
+      <h4 class="modal__header-content">{{ header }}</h4>
+    </div>
+    <div class="modal__description">
+      <p class="modal__description-content">{{ description }}</p>
+    </div>
+    <div class="modal__body">
+      <p class="modal__body-content">{{ body }}</p>
+    </div>
+    <div class="modal__footer">
+      <div class="modal__footer-content">
+        <!--        <button class=modal__button} onClick={handleClose}>{children}</button>-->
+        <button class="modal__button">{{ footer }}</button>
+      </div>
+    </div>
   </div>
 </template>
 
-<script></script>
+<script setup>
+const { emoji, header, description, body, footer } = defineProps([
+  'emoji',
+  'header',
+  'description',
+  'body',
+  'footer',
+])
+</script>
 
 <style scoped>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@keyframes fadeInAnimation {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
-.inner {
-  background-color: white;
-  padding: 1rem;
 
-  border-radius: 1rem;
-
+.modal {
+  background: #282626;
+  place-self: start center;
   display: flex;
   flex-direction: column;
-  gap: 1.4rem;
+  min-height: 20rem;
+  min-width: 22rem;
+  max-height: 20rem;
+  max-width: 22rem;
+  border-radius: 0.6rem;
+  padding: 2.5rem 1.5rem 2rem 1.5rem;
+  margin-top: 12rem;
+  animation: fadeInAnimation 1s;
+  color: white;
+  border: none;
+  justify-content: space-around;
 }
 
-.inner > h2 {
-  font-size: 3rem;
-  font-weight: bold;
+.modal__emoji {
+  display: flex;
+  font-size: 5rem;
+  align-items: center;
+  justify-content: center;
 }
 
-.inner > p {
-  font-size: 1.8rem;
-  font-weight: 300;
+.modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal__header-content {
+  margin: 0;
+  font-size: 1.6rem;
+  text-align: center;
+}
+
+.modal__description {
+  text-align: center;
+}
+
+.modal__description-content {
+  font-size: 1rem;
+  margin: 0.8rem 0 0 0;
+}
+
+.modal__body {
+  text-align: center;
+}
+
+.modal__body-content {
+  font-size: 1rem;
+}
+
+.modal__button {
+  background: #3f82f7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2rem;
+  width: 100%;
+  border-radius: 0.4rem;
+  outline: none;
+  border: none;
+  color: white;
+  font-size: 1rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
 }
 </style>

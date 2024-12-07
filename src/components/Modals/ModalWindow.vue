@@ -15,6 +15,9 @@ export default defineComponent({
           class="modal-wrapper"
           @click.self="useModalStore().closeModal"
           v-if="useModalStore().modalState?.component"
+          aria-modal="true"
+          role="dialog"
+          tabindex="-1"
         >
           <component :is="useModalStore().modalState?.component" v-bind="useModalStore().modalState?.props" />
         </div>
@@ -28,16 +31,11 @@ export default defineComponent({
   position: fixed;
   left: 0;
   top: 0;
-
   z-index: 500;
-
   width: 100vw;
   height: 100vh;
-
   background: rgba(0, 0, 0, 0.2);
-
   display: grid;
-  place-items: center;
 }
 
 .modal-fade-enter-from,

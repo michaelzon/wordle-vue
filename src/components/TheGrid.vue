@@ -17,6 +17,7 @@ const initRows = () => {
         })),
     );
 }
+
 let roundIsOver = ref(false);
 let currentRowIndex = ref(0);
 let turn = ref(0);
@@ -101,8 +102,6 @@ function addLetterToTile(key) {
 function removeLetterFromTile() {
   rows[turn.value][currentRowIndex.value].letter = ''
 }
-
-const useWordle = ()
 
 // this will help to mark a tile yellow if the same letter is correct at a higher index of a word
 // and will lead to more expected behaviour as opposed to out of te box functions like filter and includes

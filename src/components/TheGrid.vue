@@ -17,10 +17,11 @@ const initRows = () => {
         })),
     );
 }
-
-let rows = reactive(initRows());
+let roundIsOver = ref(false);
 let currentRowIndex = ref(0);
 let turn = ref(0);
+
+let rows = reactive(initRows());
 let mysteryWord = reactive([]);
 let frequencies = reactive({});
 
@@ -101,6 +102,8 @@ function removeLetterFromTile() {
   rows[turn.value][currentRowIndex.value].letter = ''
 }
 
+const useWordle = ()
+
 // this will help to mark a tile yellow if the same letter is correct at a higher index of a word
 // and will lead to more expected behaviour as opposed to out of te box functions like filter and includes
 function setFrequencies() {
@@ -141,17 +144,19 @@ function markPresentLetters() {
 function checkIfGuessIsCorrect() {
   const userHasWon = rows[turn.value].every((tile) => tile.evaluation === 'correct')
   if (userHasWon) {
+    roundIsOver.value = true;
     openWinnerModal();
   } else if (!userHasWon && turn.value === 4) {
+    roundIsOver.value = true;
     openLoserModal();
   }
 }
 
 function evaluateGuess() {
-  setFrequencies()
-  markCorrectLetters()
-  markPresentLetters()
-  checkIfGuessIsCorrect()
+  setFrequencies();
+  markCorrectLetters();
+  markPresentLetters();
+  checkIfGuessIsCorrect();
 }
 
 function clearRows() {
@@ -166,12 +171,14 @@ function clearRows() {
 }
 
 const handleTryAgain = () => {
+  roundIsOver.value = false;
   store.closeModal();
   turn.value = 0;
   currentRowIndex.value = 0;
   clearRows();
   fetchWordDataMuse();
 }
+
 </script>
 
 <template>
@@ -191,8 +198,6 @@ const handleTryAgain = () => {
       </div>
     </div>
   </div>
-  <p>the word is {{ mysteryWord }}</p>
-  <button @click="handleTryAgain">Try again</button>
   <ModalWindow />
 </template>
 

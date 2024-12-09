@@ -45,6 +45,6 @@ export default defineComponent({
 
 .modal-fade-enter-active,
 .modal-fade-leave-active {
-  transition: 0.25s ease all;
+  transition: 1s ease all;
 }
 </style>

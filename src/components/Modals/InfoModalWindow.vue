@@ -55,31 +55,18 @@ const handleKeyPress = (e) => {
 </script>
 
 <style scoped>
-@keyframes fadeInAnimation {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
 
 .modal {
   background: #282626;
   place-self: start center;
   display: flex;
   flex-direction: column;
-  min-height: 20rem;
-  min-width: 22rem;
-  max-height: 20rem;
-  max-width: 22rem;
   border-radius: 0.6rem;
-  padding: 2.5rem 1.5rem 2rem 1.5rem;
+  padding: 0 1.5rem 2rem 1.5rem;
   margin-top: 12rem;
-  animation: fadeInAnimation 1s;
+  width: 50%;
   color: white;
   border: none;
-  justify-content: space-around;
 }
 
 .modal__emoji {
@@ -116,6 +103,7 @@ const handleKeyPress = (e) => {
 
 .modal__body-content {
   font-size: 1rem;
+  margin-bottom: 1rem;
 }
 
 .modal__button {

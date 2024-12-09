@@ -1,3 +1,8 @@
+<script setup>
+import Header from './components/Header.vue'
+import TheGrid from './components/TheGrid.vue';
+</script>
+
 <template>
   <div class="container">
     <header>
@@ -7,16 +12,15 @@
     </header>
     <main>
       <TheGrid />
+      <button class="button" @click="handleTryAgain">Try again</button>
     </main>
+    <footer class="footer">
+      <p class="author">
+        Made by: Michael Zonneveld. <a class="link" href="https://github.com/michaelzon/wordle-vue">View on GitHub</a>
+      </p>
+    </footer>
   </div>
 </template>
-
-<script setup>
-
-import Header from './components/Header.vue'
-import TheGrid from './components/TheGrid.vue';
-
-</script>
 
 <style scoped>
 
@@ -24,12 +28,26 @@ import TheGrid from './components/TheGrid.vue';
   display: flex;
   flex-direction: column;
   place-items: center;
+  justify-content: space-between;
+  height: 100vh;
 }
 
 header {
   display: flex;
   place-items: center;
   line-height: 1.5;
+  margin-top: 0.4rem;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+footer p {
+  margin-bottom: 1rem;
 }
 
 @media (min-width: 1024px) {
@@ -43,4 +61,21 @@ header {
     flex-wrap: wrap;
   }
 }
+
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2rem;
+  width: 60%;
+  border-radius: 0.4rem;
+  outline: none;
+  border: none;
+  color: black;
+  font-size: 1rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
 </style>

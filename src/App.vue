@@ -1,6 +1,23 @@
 <script setup>
 import Header from './components/Header.vue'
-import TheGrid from './components/TheGrid.vue';
+import TheGrid from './components/TheGrid.vue'
+import { getMysteryWord } from '@/api/getMysteryWord.js'
+import { onMounted, ref } from 'vue'
+import { useWordle } from '@/hooks/useWordle.js'
+
+let mysteryWord = ref("")
+
+async function fetchMysteryWord() {
+  mysteryWord.value = await getMysteryWord();
+  console.log(mysteryWord.value);
+}
+
+const rows = useWordle(mysteryWord.value)
+
+onMounted(() => {
+  fetchMysteryWord();
+});
+
 </script>
 
 <template>
@@ -11,19 +28,19 @@ import TheGrid from './components/TheGrid.vue';
       </div>
     </header>
     <main>
-      <TheGrid />
+      <TheGrid :rows="rows"/>
       <button class="button" @click="handleTryAgain">Try again</button>
     </main>
     <footer class="footer">
       <p class="author">
-        Made by: Michael Zonneveld. <a class="link" href="https://github.com/michaelzon/wordle-vue">View on GitHub</a>
+        Made by: Michael Zonneveld.
+        <a class="link" href="https://github.com/michaelzon/wordle-vue">View on GitHub</a>
       </p>
     </footer>
   </div>
 </template>
 
 <style scoped>
-
 .container {
   display: flex;
   flex-direction: column;
@@ -62,7 +79,6 @@ footer p {
   }
 }
 
-
 .button {
   display: flex;
   align-items: center;
@@ -77,5 +93,4 @@ footer p {
   padding-top: 1rem;
   padding-bottom: 1rem;
 }
-
 </style>

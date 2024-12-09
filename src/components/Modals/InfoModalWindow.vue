@@ -34,8 +34,6 @@ const { emoji, header, description, body, footer, handleAction } = defineProps([
   'handleAction',
 ])
 
-
-
 onMounted(() => {
   document.addEventListener('keydown', handleKeyPress)
 })

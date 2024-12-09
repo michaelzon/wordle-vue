@@ -1,6 +1,13 @@
 <script setup>
 import Header from './components/Header.vue'
 import TheGrid from './components/TheGrid.vue';
+import useWordle from '@/hooks/useWordle.js'
+import { onMounted } from 'vue'
+
+const { rows, fetchWordDataMuse, handleTryAgain } = useWordle();
+
+onMounted(fetchWordDataMuse);
+
 </script>
 
 <template>
@@ -11,7 +18,7 @@ import TheGrid from './components/TheGrid.vue';
       </div>
     </header>
     <main>
-      <TheGrid />
+      <TheGrid :rows="rows" />
       <button class="button" @click="handleTryAgain">Try again</button>
     </main>
     <footer class="footer">

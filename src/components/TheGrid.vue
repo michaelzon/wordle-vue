@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount, reactive, watch } from 'vue'
+import { ref, onMounted, onBeforeUnmount, reactive } from 'vue'
 import ModalWindow from './Modals/ModalWindow.vue'
 import useModalStore from '../stores/useModalStore'
 
@@ -15,14 +15,14 @@ const initRows = () => {
           letter: '',
           evaluation: '',
         })),
-    )
+    );
 }
 
-let rows = reactive(initRows())
-let currentRowIndex = ref(0)
-let turn = ref(0)
-let mysteryWord = reactive([])
-let frequencies = reactive({})
+let rows = reactive(initRows());
+let currentRowIndex = ref(0);
+let turn = ref(0);
+let mysteryWord = reactive([]);
+let frequencies = reactive({});
 
 async function fetchWordDataMuse() {
   try {
@@ -54,6 +54,7 @@ function openWinnerModal() {
     `You guessed the word: '${mysteryWord.join('')}'!`,
     "Congrats! You've crushed it and won the game. Now, bask in your glory and celebrate like a boss! 🎉",
     'Try Again',
+    handleTryAgain
   )
 }
 
@@ -64,14 +65,11 @@ function openLoserModal() {
     `The word was: '${mysteryWord.join('')}'!`,
     "You didn't quite make it this time, but hey no worries! Give it another shot, and whoknows, the next round might be your moment of glory! Keep going champ! 💪🎮 ",
     'Try Again',
+    handleTryAgain
   )
 }
 
 const handleKeyPress = (e) => {
-  if (e.key === 'Escape') {
-    store.closeModal()
-  }
-
   if (e.metaKey || e.ctrlKey) {
     return // Allow the default behavior for shortcuts like Cmd+R or Ctrl+R
   }
@@ -89,7 +87,6 @@ const handleKeyPress = (e) => {
 
   if (e.key === 'Enter' && currentRowIndex.value === 5) {
     setFrequencies()
-
     currentRowIndex.value = 0
     evaluateGuess()
     turn.value++
@@ -144,9 +141,9 @@ function markPresentLetters() {
 function checkIfGuessIsCorrect() {
   const userHasWon = rows[turn.value].every((tile) => tile.evaluation === 'correct')
   if (userHasWon) {
-    openWinnerModal()
+    openWinnerModal();
   } else if (!userHasWon && turn.value === 4) {
-    openLoserModal()
+    openLoserModal();
   }
 }
 
@@ -160,20 +157,20 @@ function evaluateGuess() {
 function clearRows() {
   rows.forEach((row) => {
     if (row.some((tile) => tile.letter)) {
-      // only loop over rows that contain input
-      row.forEach((tile) => {
-        tile.letter = ''
-        tile.evaluation = ''
-      })
+      row.forEach((tile) => { // only loop over rows that contain input
+        tile.letter = '';
+        tile.evaluation = '';
+      });
     }
-  })
+  });
 }
 
 const handleTryAgain = () => {
-  turn.value = 0
-  currentRowIndex.value = 0
-  clearRows()
-  fetchWordDataMuse()
+  store.closeModal();
+  turn.value = 0;
+  currentRowIndex.value = 0;
+  clearRows();
+  fetchWordDataMuse();
 }
 </script>
 

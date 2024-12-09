@@ -12,21 +12,46 @@
     </div>
     <div class="modal__footer">
       <div class="modal__footer-content">
-        <!--        <button class=modal__button} onClick={handleClose}>{children}</button>-->
-        <button class="modal__button">{{ footer }}</button>
+        <!--        <button class=modal__button} {children}</button>-->
+        <button @click="handleAction()" class="modal__button">{{ footer }}</button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-const { emoji, header, description, body, footer } = defineProps([
+import { onBeforeUnmount, onMounted } from 'vue'
+import useModalStore from '@/stores/useModalStore.js'
+
+const store = useModalStore()
+
+const { emoji, header, description, body, footer, handleAction } = defineProps([
   'emoji',
   'header',
   'description',
   'body',
   'footer',
+  'handleAction',
 ])
+
+
+
+onMounted(() => {
+  document.addEventListener('keydown', handleKeyPress)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('keydown', handleKeyPress)
+})
+
+const handleKeyPress = (e) => {
+  if (e.key === 'Escape') {
+    store.closeModal();
+  }
+  if (e.key === 'Enter') {
+    handleAction();
+  }
+}
 </script>
 
 <style scoped>

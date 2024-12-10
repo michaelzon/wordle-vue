@@ -1,17 +1,11 @@
 <script setup>
 import ModalWindow from './Modals/ModalWindow.vue'
-import { watch } from 'vue'
 
 const { rows, wordExists, turn } = defineProps([
   'rows',
   'wordExists',
   'turn'
 ])
-
-console.log(wordExists, turn)
-watch(() => wordExists, () => {
-  console.log('harry bever', wordExists, );
-})
 
 </script>
 

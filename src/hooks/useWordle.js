@@ -1,14 +1,16 @@
 import { onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import useModalStore from '@/stores/useModalStore.js'
+import { existingWords } from '@/words.js'
 
 export default function useWordle() {
   const store = useModalStore()
-  let roundIsOver = ref(false);
-  let currentRowIndex = ref(0);
-  let turn = ref(0);
-  let rows = reactive(initRows());
-  let mysteryWord = reactive([]);
-  let frequencies = reactive({});
+  let roundIsOver = ref(false)
+  let currentRowIndex = ref(0)
+  let turn = ref(0)
+  let rows = reactive(initRows())
+  let mysteryWord = reactive([])
+  let frequencies = reactive({})
+  let wordExists = ref(true)
 
   function initRows() {
     return Array(5)
@@ -20,7 +22,7 @@ export default function useWordle() {
             letter: '',
             evaluation: '',
           })),
-      );
+      )
   }
 
   async function fetchWordDataMuse() {
@@ -43,7 +45,7 @@ export default function useWordle() {
     document.removeEventListener('keydown', handleKeyPress)
   })
 
-// Make a function that opens modal with our inner component
+  // Make a function that opens modal with our inner component
   function openWinnerModal() {
     store.openInfoModal(
       '🏆',
@@ -51,7 +53,7 @@ export default function useWordle() {
       `You guessed the word: '${mysteryWord.join('')}'!`,
       "Congrats! You've crushed it and won the game. Now, bask in your glory and celebrate like a boss! 🎉",
       'Try Again',
-      handleTryAgain
+      handleTryAgain,
     )
   }
 
@@ -62,8 +64,12 @@ export default function useWordle() {
       `The word was: '${mysteryWord.join('')}'!`,
       "You didn't quite make it this time, but hey no worries! Give it another shot, and whoknows, the next round might be your moment of glory! Keep going champ! 💪🎮 ",
       'Try Again',
-      handleTryAgain
+      handleTryAgain,
     )
+  }
+
+  function getCurrentGuess() {
+    return rows[turn.value].map((tile) => tile.letter).join('')
   }
 
   const handleKeyPress = (e) => {
@@ -78,15 +84,30 @@ export default function useWordle() {
     }
 
     if (e.key === 'Backspace' && currentRowIndex.value > 0) {
+      wordExists.value = true
       currentRowIndex.value = currentRowIndex.value - 1
       removeLetterFromTile()
     }
 
     if (e.key === 'Enter' && currentRowIndex.value === 5) {
-      setFrequencies()
-      currentRowIndex.value = 0
-      evaluateGuess()
-      turn.value++
+      const lookUpWord = new Promise((resolve, reject) => {
+        if (existingWords.includes(getCurrentGuess())) {
+          resolve('Word is in dictionary')
+        } else {
+          wordExists.value = false
+          reject('Word is not in dictionary')
+        }
+      })
+      lookUpWord
+        .then(() => {
+          setFrequencies()
+          currentRowIndex.value = 0
+          evaluateGuess()
+          turn.value++
+        })
+        .catch(() => {
+          console.log('word does not exist')
+        })
     }
   }
 
@@ -98,8 +119,8 @@ export default function useWordle() {
     rows[turn.value][currentRowIndex.value].letter = ''
   }
 
-// this will help to mark a tile yellow if the same letter is correct at a higher index of a word
-// and will lead to more expected behaviour as opposed to out of te box functions like filter and includes
+  // this will help to mark a tile yellow if the same letter is correct at a higher index of a word
+  // and will lead to more expected behaviour as opposed to out of te box functions like filter and includes
   function setFrequencies() {
     frequencies = {}
     mysteryWord.forEach((letter) => {
@@ -138,44 +159,49 @@ export default function useWordle() {
   function checkIfGuessIsCorrect() {
     const userHasWon = rows[turn.value].every((tile) => tile.evaluation === 'correct')
     if (userHasWon) {
-      roundIsOver.value = true;
-      openWinnerModal();
+      roundIsOver.value = true
+      openWinnerModal()
     } else if (!userHasWon && turn.value === 4) {
-      roundIsOver.value = true;
-      openLoserModal();
+      roundIsOver.value = true
+      openLoserModal()
     }
   }
 
   function evaluateGuess() {
-    setFrequencies();
-    markCorrectLetters();
-    markPresentLetters();
-    checkIfGuessIsCorrect();
+    setFrequencies()
+    markCorrectLetters()
+    markPresentLetters()
+    checkIfGuessIsCorrect()
   }
 
   function clearRows() {
     rows.forEach((row) => {
       if (row.some((tile) => tile.letter)) {
-        row.forEach((tile) => { // only loop over rows that contain input
-          tile.letter = '';
-          tile.evaluation = '';
-        });
+        row.forEach((tile) => {
+          // only loop over rows that contain input
+          tile.letter = ''
+          tile.evaluation = ''
+        })
       }
-    });
+    })
   }
 
   const handleTryAgain = () => {
-    roundIsOver.value = false;
-    store.closeModal();
-    turn.value = 0;
-    currentRowIndex.value = 0;
-    clearRows();
-    fetchWordDataMuse();
+    roundIsOver.value = false
+    store.closeModal()
+    turn.value = 0
+    currentRowIndex.value = 0
+    clearRows()
+    fetchWordDataMuse()
   }
+
+  console.log('hook word exists', wordExists);
 
   return {
     rows,
     fetchWordDataMuse,
     handleTryAgain,
-  };
+    wordExists,
+    turn
+  }
 }

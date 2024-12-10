@@ -4,7 +4,7 @@ import TheGrid from './components/TheGrid.vue';
 import useWordle from '@/hooks/useWordle.js'
 import { onMounted } from 'vue'
 
-const { rows, fetchWordDataMuse, handleTryAgain } = useWordle();
+const { rows, fetchWordDataMuse, handleTryAgain, wordExists, turn } = useWordle();
 
 onMounted(fetchWordDataMuse);
 
@@ -18,7 +18,7 @@ onMounted(fetchWordDataMuse);
       </div>
     </header>
     <main>
-      <TheGrid :rows="rows" />
+      <TheGrid :rows="rows" :word-exists="wordExists" :turn="turn" />
       <button class="button" @click="handleTryAgain">Try again</button>
     </main>
     <footer class="footer">

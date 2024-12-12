@@ -1,22 +1,12 @@
 <script setup>
 import Header from './components/Header.vue'
-import TheGrid from './components/TheGrid.vue'
-import { getMysteryWord } from '@/api/getMysteryWord.js'
-import { onMounted, ref } from 'vue'
-import { useWordle } from '@/hooks/useWordle.js'
+import TheGrid from './components/TheGrid.vue';
+import useWordle from '@/hooks/useWordle.js'
+import { onMounted } from 'vue'
 
-let mysteryWord = ref("")
+const { rows, fetchWordDataMuse, handleTryAgain, wordExists, turn } = useWordle();
 
-async function fetchMysteryWord() {
-  mysteryWord.value = await getMysteryWord();
-  console.log(mysteryWord.value);
-}
-
-const rows = useWordle(mysteryWord.value)
-
-onMounted(() => {
-  fetchMysteryWord();
-});
+onMounted(fetchWordDataMuse);
 
 </script>
 
@@ -28,7 +18,7 @@ onMounted(() => {
       </div>
     </header>
     <main>
-      <TheGrid :rows="rows"/>
+      <TheGrid :rows="rows" :word-exists="wordExists" :turn="turn" />
       <button class="button" @click="handleTryAgain">Try again</button>
     </main>
     <footer class="footer">

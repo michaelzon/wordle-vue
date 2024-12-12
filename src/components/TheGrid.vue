@@ -1,12 +1,19 @@
 <script setup>
-import ModalWindow from '@/components/Modals/ModalWindow.vue'
+import ModalWindow from './Modals/ModalWindow.vue'
 
+const { rows, wordExists, turn } = defineProps([
+  'rows',
+  'wordExists',
+  'turn'
+])
 
 </script>
 
 <template>
   <div class="grid">
-    <div class="grid__row" v-for="row in rows" :key="row">
+    <div class="grid__row" v-for="(row, index) in rows" :key="row" :class="{
+        'grid__row--incorrect-word': index === turn && !wordExists,
+      }">
       <div
         class="grid__tile"
         v-for="tile in row"
@@ -66,6 +73,11 @@ button {
 .grid__tile--filled {
   background-color: #333335;
   animation: fadeInAnimation 0.2s;
+}
+
+.grid__row--incorrect-word .grid__item {
+  background-color: red;
+  animation: fadeInAnimation 2s;
 }
 
 .letter-correct {

@@ -31,7 +31,6 @@ export default function useWordle() {
       const words = await response.json()
       const word = words[Math.floor(Math.random() * 100)].word
       mysteryWord = word.split('')
-      console.log('mw in fetch', mysteryWord)
     } catch (error) {
       console.error('Error fetching wordle data', error)
     }
@@ -194,8 +193,6 @@ export default function useWordle() {
     clearRows()
     fetchWordDataMuse()
   }
-
-  console.log('hook word exists', wordExists);
 
   return {
     rows,
